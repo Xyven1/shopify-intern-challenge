@@ -1,14 +1,18 @@
 <template>
   <v-app :theme="theme" style="min-height: 100%;">
     <v-app-bar>
-      <v-app-bar-title>Spacestagram</v-app-bar-title>
+      <v-app-bar-title>Spacestagram |
+        <v-btn href="https://github.com/Xyven1/shopify-intern-challenge" class="pl-2">
+          <v-icon size="x-large">mdi-github</v-icon>&nbsp;Code
+        </v-btn>
+      </v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn variant="outlined" color="secondary" @click="toggleLiked">{{showLiked ? 'New Posts' : 'Liked Posts'}}</v-btn>
       <v-btn icon @click="toggleTheme">
         <v-icon>mdi-theme-light-dark </v-icon>
       </v-btn>
     </v-app-bar>
-    <v-main>
+    <v-main ref="main">
       <v-container class="d-flex flex-wrap justify-center">
         <KeepAlive>
           <template v-if="!showLiked">
@@ -35,6 +39,7 @@ import axios from 'axios'
 import Post from './components/Post.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
+import { compileScript } from 'vue/compiler-sfc'
 
 export default {
   name: 'App',
@@ -75,7 +80,7 @@ export default {
       const vm = this
       let debounce = false
       window.onscroll = () => {
-        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight + 500 >= document.documentElement.offsetHeight;
+        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight + 500 >= vm.$refs.main.$el.offsetHeight;
         if (bottomOfWindow && !debounce && !vm.showLiked) {
           debounce = true
           console.log('bottom of window')
@@ -109,8 +114,6 @@ export default {
   setup(){
     const { name } = useDisplay()
     const postsPerRow = computed(() => {
-      // name is reactive and
-      // must use .value
       switch (name.value) {
         case 'xs': return 1
         case 'sm': return 1
