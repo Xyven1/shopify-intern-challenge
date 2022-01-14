@@ -1,10 +1,30 @@
 <template>
-  <v-app>
+  <v-app :theme="theme" style="min-height: 100%;">
+    <v-app-bar>
+      <v-app-bar-title>Spacestagram</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <v-btn variant="outlined" color="secondary" @click="toggleLiked">{{showLiked ? 'New Posts' : 'Liked Posts'}}</v-btn>
+      <v-btn icon @click="toggleTheme">
+        <v-icon>mdi-theme-light-dark </v-icon>
+      </v-btn>
+    </v-app-bar>
     <v-main>
       <v-container class="d-flex flex-wrap justify-center">
-        <div v-for="(post,i) in posts" :key="i" :style="{'max-width': postWidth + '%' }">
-          <Post class="ma-2"  :post="post" />
-        </div>
+        <KeepAlive>
+          <template v-if="!showLiked">
+            <div v-for="(post,i) in posts" :key="i" :style="{'max-width': 100/postsPerRow + '%' }">
+              <Post class="ma-2"  :post="post" />
+            </div>
+            <v-row class="ma-0" align="center" justify="center" style="height:100%; width: 100%">
+              <v-progress-circular indeterminate color="grey lighten-5"/>
+            </v-row>
+          </template>
+          <template v-else>
+            <div v-for="(post,i) in likedPosts" :key="i" :style="{'max-width': 100/postsPerRow + '%' }">
+              <Post class="ma-2"  :post="post" />
+            </div>
+          </template>
+        </KeepAlive>
       </v-container>
     </v-main>
   </v-app>
@@ -22,9 +42,11 @@ export default {
     Post,
   },
   data: () => ({
-    posts: [
-    ],
+    posts: [],
     date: null,
+    showLiked: false,
+    likedPosts: [],
+    theme: 'light',
   }),
   methods: {
     /**
@@ -41,47 +63,71 @@ export default {
     getPosts(number){
       const vm = this
       let earlier = new Date(vm.date)
-      earlier.setDate(vm.date.getDate()-number)
+      earlier.setDate(vm.date.getDate()-number+1)
       const url = `https://api.nasa.gov/planetary/apod?api_key=2xWRd7P1EgwroBvrBied82EtGSds0DBCmbi6qh4f&start_date=${vm.dateAsString(earlier)}&end_date=${vm.dateAsString(vm.date)}`
+      vm.date.setDate(vm.date.getDate()-number)
       return axios.get(url).then(response => {
         vm.posts.push(...response.data.reverse())
-        vm.date.setDate(vm.date.getDate()-number-1)
         return vm.posts
       })
     },
     loadOnScroll(){
       const vm = this
+      let debounce = false
       window.onscroll = () => {
-        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
-        if (bottomOfWindow) {
-          vm.getPosts(10)
+        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight + 500 >= document.documentElement.offsetHeight;
+        if (bottomOfWindow && !debounce && !vm.showLiked) {
+          debounce = true
+          console.log('bottom of window')
+          vm.getPosts(10).then(() => {
+            debounce = false
+          })
         }
       }
+    },
+    toggleLiked(){
+      const vm = this
+      vm.likedPosts = []
+      vm.showLiked = !vm.showLiked
+      if(vm.showLiked)
+        for(const [_, val] of Object.entries(JSON.parse(localStorage.getItem('likedPosts')||'{}')))
+          vm.likedPosts.push(val)
+    },
+    toggleTheme(){
+      const vm = this
+      vm.theme = vm.theme === 'light' ? 'dark' : 'light'
+      localStorage.setItem('theme', vm.theme)
     },
   },
   mounted(){
     const vm = this
+    vm.theme = localStorage.getItem('theme') || vm.theme
     vm.date = new Date()
     vm.getPosts(10)
     vm.loadOnScroll();
   },
   setup(){
     const { name } = useDisplay()
-    const postWidth = computed(() => {
+    const postsPerRow = computed(() => {
       // name is reactive and
       // must use .value
       switch (name.value) {
-        case 'xs': return 100
-        case 'sm': return 100
-        case 'md': return 100/2
-        case 'lg': return 100/2
-        case 'xl': return 100/3
-        case 'xxl': return 100/3
+        case 'xs': return 1
+        case 'sm': return 1
+        case 'md': return 2
+        case 'lg': return 2
+        case 'xl': return 3
+        case 'xxl': return 3
       }
     })
     return {
-      postWidth,
+      postsPerRow,
     }
   },
 }
 </script>
+<style>
+html, body, #app {
+  height: 100% !important;
+}
+</style>

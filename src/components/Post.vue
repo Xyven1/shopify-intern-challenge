@@ -1,14 +1,21 @@
 <template>
   <v-card elevation="10">
-    <v-img :src="post?.url" @click="overlayed = !overlayed" v-if="post?.media_type == 'image'">
-      <template v-slot:placeholder>
-        <v-row class="ma-0" align="center" justify="center" style="height:100%">
-          <v-progress-circular indeterminate color="grey lighten-5"/>
-        </v-row>
-      </template>
-    </v-img>
-    <div v-else style="position: relative; width: 100%; padding-bottom: 56.25%; float: left; height: 0;">
-      <iframe loading="lazy" :src="post?.url" style="width: 100%; height: 100%; position: absolute; left:0"/>
+    <v-hover v-slot="{ hover, props }"  v-if="post?.media_type == 'image'">
+      <v-img :src="post?.url" @click="overlayed = !overlayed" v-bind="props" style="cursor: pointer;">
+        <template v-slot:placeholder>
+          <v-row class="ma-0" align="center" justify="center" style="height:100%">
+            <v-progress-circular indeterminate color="grey lighten-5"/>
+          </v-row>
+        </template>
+        <v-expand-transition>
+          <div v-if="hover" class="d-flex v-card--reveal text-h5 text-grey" style="height: 100%">
+            Click to Enlarge
+          </div>
+        </v-expand-transition>
+      </v-img>
+    </v-hover>
+    <div v-if="post?.media_type == 'video'" style="position: relative; width: 100%; padding-bottom: 56.25%; float: left; height: 0;">
+      <iframe allowfullscreen  loading="lazy" :src="post?.url" style="width: 100%; height: 100%; position: absolute; left:0"/>
     </div>
     <v-btn icon @click="liked=!liked" color="transparent" elevation="0" size="x-small" class="ml-2 mt-1" :ripple="false">
       <v-icon color="grey-darken-1" style="position:absolute" size="x-large">
@@ -31,6 +38,11 @@
     </v-card-text>
     <v-overlay v-model="overlayed">
       <div style="height: 100vh; width: 100vw" class="d-flex align-center justify-center" @click="overlayed=false">
+        <div style="position: absolute; top: 0; right: 0" class="pa-2">
+          <v-icon style="font-size: 3em; cursor: pointer;" color="dark-grey">
+            mdi-close
+          </v-icon>
+        </div>
         <v-img :src="post?.hdurl" style="width: 90%; height: 90%;">
           <template v-slot:placeholder>
             <v-row class="ma-0" align="center" justify="center" style="height:100%">
@@ -51,18 +63,26 @@ export default {
   data() {
     return {
       liked: false,
-      overlayed: false, 
+      overlayed: false,
+      likedPosts: {}
     }
   },
   mounted(){
-    this.liked = localStorage.getItem(this.post.url)=="liked"
+    this.liked = !!JSON.parse(localStorage.getItem('likedPosts')||'{}')[this.post.date]
   },
   watch: {
     liked(val){
-      if(val)
-        localStorage.setItem(this.post.url, "liked")
+      this.setLiked(val)
+    }
+  },
+  methods: {
+    setLiked(liked){
+      let likedPosts = JSON.parse(localStorage.getItem('likedPosts')||'{}')
+      if(liked)
+        likedPosts[this.post.date] = this.post
       else
-        localStorage.removeItem(this.post.url)
+        delete likedPosts[this.post.date]
+      localStorage.setItem('likedPosts', JSON.stringify(likedPosts))
     }
   }
 }
@@ -88,5 +108,13 @@ export default {
   100% {
     transform: scale(1);
   }
+}
+.v-card--reveal {
+  align-items: end;
+  bottom: 0;
+  justify-content: center;
+  opacity: .8;
+  position: absolute;
+  width: 100%;
 }
 </style>
