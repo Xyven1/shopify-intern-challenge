@@ -1,7 +1,7 @@
 <template>
   <v-card elevation="10">
     <v-hover v-slot="{ hover, props }"  v-if="post?.media_type == 'image'">
-      <v-img :src="post?.url" @click="overlayed = !overlayed" v-bind="props" style="cursor: pointer;">
+      <v-img title="Click to enlarge" :src="post?.url" @click="overlayed = !overlayed" v-bind="props" style="cursor: pointer;">
         <template v-slot:placeholder>
           <v-row class="ma-0" align="center" justify="center" style="height:100%">
             <v-progress-circular indeterminate color="grey lighten-5"/>
@@ -17,7 +17,7 @@
     <div v-if="post?.media_type == 'video'" style="position: relative; width: 100%; padding-bottom: 56.25%; float: left; height: 0;">
       <iframe allowfullscreen  loading="lazy" :src="post?.url" style="width: 100%; height: 100%; position: absolute; left:0"/>
     </div>
-    <v-btn icon @click="liked=!liked" color="transparent" elevation="0" size="x-small" class="ml-2 mt-1" :ripple="false">
+    <v-btn icon @click="liked=!liked" color="transparent" elevation="0" size="x-small" class="ml-2 mt-1" :ripple="false" title="Like">
       <v-icon color="grey-darken-1" style="position:absolute" size="x-large">
         mdi-heart-outline
       </v-icon>
@@ -26,6 +26,11 @@
           mdi-heart
         </v-icon>
       </transition>
+    </v-btn>
+    <v-btn icon color="transparent" elevation="0" @click="" title="Share">
+      <v-icon>
+        mdi-share-variant
+      </v-icon>
     </v-btn>
     <v-card-text class="pa-2 float-right">
       {{post?.date}}

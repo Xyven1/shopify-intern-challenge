@@ -3,3 +3,5 @@ node_modules
 dist
 dist-ssr
 *.local
+/greenlock.d/*
+!/greenlock.d/config.json
