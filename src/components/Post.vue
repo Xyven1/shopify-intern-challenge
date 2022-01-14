@@ -27,11 +27,6 @@
         </v-icon>
       </transition>
     </v-btn>
-    <v-btn icon color="transparent" elevation="0" @click="" title="Share">
-      <v-icon>
-        mdi-share-variant
-      </v-icon>
-    </v-btn>
     <v-card-text class="pa-2 float-right">
       {{post?.date}}
     </v-card-text>
