@@ -13,6 +13,7 @@
 <script>
 import axios from 'axios'
 import Post from './components/Post.vue'
+import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
 export default {
@@ -64,19 +65,23 @@ export default {
     vm.getPosts(10)
     vm.loadOnScroll();
   },
-  computed:{
-    postWidth(){
-      const vm = this
-      const { name } = useDisplay()
+  setup(){
+    const { name } = useDisplay()
+    const postWidth = computed(() => {
+      // name is reactive and
+      // must use .value
       switch (name.value) {
         case 'xs': return 100
         case 'sm': return 100
         case 'md': return 100/2
         case 'lg': return 100/2
         case 'xl': return 100/3
-        case 'xxl': return 100/4
+        case 'xxl': return 100/3
       }
-    },
+    })
+    return {
+      postWidth,
+    }
   },
 }
 </script>
