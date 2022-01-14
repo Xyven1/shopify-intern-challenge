@@ -39,7 +39,6 @@ import axios from 'axios'
 import Post from './components/Post.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
-import { compileScript } from 'vue/compiler-sfc'
 
 export default {
   name: 'App',
