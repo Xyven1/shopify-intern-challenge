@@ -1,6 +1,6 @@
 # Shopify Front End Developer Intern Challenge
 
-This is my code for Shopify's Front End Developer Intern Challenge. I completed it in 5 hours using tools and frameworks I am quite familiar with, namely the Vite, Vue, Vuetify stack. I also deployed the site over https using greenlock-express to automatically manage my ssl certificates. Finally I used pm2 to manage the process on the server the code is running on.
+This is my code for Shopify's Front End Developer Intern Challenge. I completed it in 6 hours using tools and frameworks I am quite familiar with, namely the Vite, Vue, Vuetify stack. I also deployed the site over https using greenlock-express to automatically manage my ssl certificates. Finally I used pm2 to manage the process on the server the code is running on.
 
 # Features
 
