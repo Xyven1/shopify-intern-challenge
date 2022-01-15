@@ -15,14 +15,15 @@ app.get(/.*/, (req, res) => {
   res.sendFile(path.join(path.resolve(), './dist/index.html'))
 })
 
-// greenlock.init({
-//   packageRoot: path.resolve(),
-//   configDir: './greenlock.d',
-//   maintainerEmail: 'babruell@wpi.edu',
-//   cluster: false,
-// }).serve(app)
-
-const port = process.env.PORT || 3000
-server.listen(port, () =>{
-    console.log(`app is listening on port: ${port}`)
-})
+if(process.env.PLATFORM == 'heroku') {
+  app.listen(port, () =>{
+      console.log(`app is listening on port: ${port}`)
+  })
+} else {
+  greenlock.init({
+    packageRoot: path.resolve(),
+    configDir: './greenlock.d',
+    maintainerEmail: 'babruell@wpi.edu',
+    cluster: false,
+  }).serve(app)
+}
