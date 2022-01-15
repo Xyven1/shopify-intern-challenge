@@ -23,6 +23,6 @@ app.get(/.*/, (req, res) => {
 // }).serve(app)
 
 const port = process.env.PORT || 3000
-server.listen(port, () =>{
+app.listen(port, () =>{
     console.log(`app is listening on port: ${port}`)
 })
